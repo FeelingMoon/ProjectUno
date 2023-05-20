@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+@import "https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css";
+
+@import
+	url('https://fonts.googleapis.com/css2?family=Yantramanav:wght@400&display=swap')
+	;
+
+html, body {
+	font-family: 'Yantramanav', sans-serif;
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	background-image:
+		url('https://wallpaperaccess.com/full/1093305.jpg');
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+	height: 100%;
+}
+.scrollable-table {
+	max-height: 300px; /* Ajusta la altura máxima deseada */
+	overflow-y: auto;
+}
+
+.center-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
