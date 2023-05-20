@@ -42,7 +42,7 @@ public class JuegoBean implements Serializable {
 		repartirCartas();
 		jugadorActual = jugadores.get(0); // Comienza el juego con el primer jugador
 		cartaActual = obtenerCartaAleatoria();
-//		seleccionarSiguienteCarta();
+
 	}
 
 	public Carta obtenerCartaAleatoria() {
@@ -72,7 +72,7 @@ public class JuegoBean implements Serializable {
 					cartaActual = cartaJugada;
 					jugadorActual.getCartas().remove(cartaJugada);
 					seleccionarSiguienteJugador();
-//					seleccionarSiguienteCarta();
+
 					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 							"Carta jugada: " + cartaJugada.toString(), ""));
 
@@ -107,10 +107,6 @@ public class JuegoBean implements Serializable {
 		this.numero = numero;
 	}
 
-	public void moverSiguienteCarta() {
-		// No se necesita implementar para el funcionamiento actual
-	}
-
 	public void repartirCartas() {
 		int cartasPorJugador = 4; // Repartir cuatro cartas a cada jugador
 
@@ -142,16 +138,6 @@ public class JuegoBean implements Serializable {
 
 		return mazo;
 	}
-
-//	public void seleccionarSiguienteCarta() {
-//		if (cartaActual == null) {
-//			cartaActual = jugadorActual.getCartas().get(0);
-//		} else {
-//			int indiceSiguienteCarta = (jugadorActual.getIndiceCartaActual() + 1) % jugadorActual.getCartas().size();
-//			cartaActual = jugadorActual.getCartas().get(indiceSiguienteCarta);
-//			jugadorActual.setIndiceCartaActual(indiceSiguienteCarta);
-//		}
-//	}
 
 	public void seleccionarSiguienteJugador() {
 		int indexActual = jugadores.indexOf(jugadorActual);
