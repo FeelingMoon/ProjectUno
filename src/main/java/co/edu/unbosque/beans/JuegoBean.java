@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import co.edu.unbosque.persistence.Carta;
+import co.edu.unbosque.persistence.Imagen64;
 import co.edu.unbosque.persistence.Jugador;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -26,6 +27,15 @@ public class JuegoBean implements Serializable {
 	private String color;
 	private String numero;
 	private Carta cartaJugada; // Agregamos una nueva propiedad para almacenar la carta jugada
+	private boolean confirmacion;
+
+	public boolean isConfirmacion() {
+		return confirmacion;
+	}
+
+	public void setConfirmacion(boolean confirmacion) {
+		this.confirmacion = confirmacion;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -42,6 +52,8 @@ public class JuegoBean implements Serializable {
 		repartirCartas();
 		jugadorActual = jugadores.get(0); // Comienza el juego con el primer jugador
 		cartaActual = obtenerCartaAleatoria();
+		confirmacion = false;
+		color = "";
 
 	}
 
@@ -63,6 +75,7 @@ public class JuegoBean implements Serializable {
 	}
 
 	public void jugarCarta() {
+
 		Jugador jugadorActual = getJugadorActual();
 
 		if (cartaJugada != null) {
@@ -72,6 +85,20 @@ public class JuegoBean implements Serializable {
 					cartaActual = cartaJugada;
 					jugadorActual.getCartas().remove(cartaJugada);
 					seleccionarSiguienteJugador();
+					
+					if (cartaJugada.getNumero().equals("+2")) {
+						robarCarta();
+						robarCarta();
+					}
+					if (cartaJugada.getColor().equals("Especiales")) {
+						setConfirmacion(true);
+						if (cartaJugada.getNumero().equals("+4")) {
+							robarCarta();
+							robarCarta();
+							robarCarta();
+							robarCarta();
+						}
+					}
 
 					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 							"Carta jugada: " + cartaJugada.toString(), ""));
@@ -125,15 +152,27 @@ public class JuegoBean implements Serializable {
 		for (String color : Arrays.asList("Rojo", "Verde", "Azul", "Amarillo")) {
 			// Cartas numeradas
 			for (int numero = 0; numero <= 9; numero++) {
-				mazo.add(new Carta(color, String.valueOf(numero)));
+
+				Carta nueva = new Carta(color, String.valueOf(numero));
+//				nueva.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + numero + color + ".png"));
+				mazo.add(nueva);
+
 				if (numero != 0) {
-					mazo.add(new Carta(color, String.valueOf(numero)));
+					mazo.add(nueva);
 				}
 			}
 
 			mazo.add(new Carta(color, "Salto"));
 			mazo.add(new Carta(color, "Reversa"));
 			mazo.add(new Carta(color, "+2"));
+			mazo.add(new Carta(color, "Salto"));
+			mazo.add(new Carta(color, "Reversa"));
+			mazo.add(new Carta(color, "+2"));
+
+		}
+		for (int i = 0; i <= 3; i++) {
+			mazo.add(new Carta("Especiales", "Multi"));
+			mazo.add(new Carta("Especiales", "+4"));
 		}
 
 		return mazo;
@@ -169,11 +208,40 @@ public class JuegoBean implements Serializable {
 			return true;
 		}
 
-		if (carta.getNumero().equals("Comodín")) {
+		if (carta.getColor().equals("Especiales")) {
 			return true;
 		}
 
 		return false;
+	}
+
+	public void cambiarColorAzul() {
+		confirmacion = false;
+		cartaActual.setColor("Azul");
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a azul", null));
+		
+	}
+	public void cambiarColorRojo() {
+		confirmacion = false;
+		cartaActual.setColor("Rojo");
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a rojo", null));
+		
+	}
+	public void cambiarColorAmarillo() {
+		confirmacion = false;
+		cartaActual.setColor("Amarillo");
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a amarillo", null));
+		
+	}
+	public void cambiarColorVerde() {
+		confirmacion = false;
+		cartaActual.setColor("Verde");
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a verde", null));
+		
 	}
 
 	public Carta getCartaJugada() {
