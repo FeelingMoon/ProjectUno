@@ -1,5 +1,7 @@
 package co.edu.unbosque.persistence;
 
+import javax.swing.JOptionPane;
+
 public class Carta {
 	private String color;
 	private String numero;
@@ -17,6 +19,7 @@ public class Carta {
 	}
 
 	public void setColor(String color) {
+		JOptionPane.showMessageDialog(null, color);
 		this.color = color;
 	}
 

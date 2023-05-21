@@ -49,33 +49,29 @@
 							</tbody>
 						</table>
 					</div>
-					<div>
-						<p:confirmDialog global="true" header = "Color" showEffect="fade" hideEffect="fade" message = "Elige un color"
-							responsive="true" visible = "#{juego.confirmacion}">
-							<p:commandButton value="Rojo" type="button"
-								styleClass="rounded-button ui-button-danger" oncomplete="PF('confirmationWidget').hide()"
-								action = "#{juego.cambiarColorRojo}" update="confirmDialog" process="@this">
-								</p:commandButton>
-							<p:commandButton value="Azul" type="button"
-								styleClass="rounded-button"  oncomplete="PF('confirmationWidget').hide()"
-								action = "#{juego.cambiarColorAzul}" update="confirmDialog" process="@this">
-								</p:commandButton>
-							<p:commandButton value="Amarillo" type="button"
-								styleClass="rounded-button ui-button-warning" oncomplete="PF('confirmationWidget').hide()"
-								action = "#{juego.cambiarColorAmarillo}" update="confirmDialog" process="@this">
-								</p:commandButton>
-							<p:commandButton value="Verde" type="button"
-								styleClass="rounded-button ui-button-success" oncomplete="PF('confirmationWidget').hide()"
-								action = "#{juego.cambiarColorVerde}" update="confirmDialog" process="@this">
-								</p:commandButton>
-						</p:confirmDialog>
-					</div>
+
 					<div class="has-text-centered">
 						<p:commandButton class="button is-link  mt-3" value="Robar"
 							action="#{juego.robarCarta}" update="@form" />
 						<p:messages />
 						<!-- La parte de las imagenes se van a hacer con tooltip https://www.primefaces.org/showcase/ui/overlay/tooltip/tooltipOptions.xhtml?jfwid=27dc2 -->
 					</div>
+					<p:confirmDialog global="true" header="Color" showEffect="fade"
+						hideEffect="fade" message="Elige un color" responsive="true"
+						visible="#{juego.confirmacion}">
+
+						<div class="buttons">
+							<p:commandButton value="Rojo" styleClass="button is-danger"
+								action="#{juego.cambiarColorRojo}" update="@form" />
+							<p:commandButton value="Azul" styleClass="button"
+								action="#{juego.cambiarColorAzul}" update="@form" />
+							<p:commandButton value="Amarillo" styleClass="button is-warning"
+								action="#{juego.cambiarColorAmarillo}" update="@form" />
+							<p:commandButton value="Verde" styleClass="button is-success"
+								action="#{juego.cambiarColorVerde}" update="@form" />
+						</div>
+
+					</p:confirmDialog>
 				</h:form>
 			</div>
 		</div>

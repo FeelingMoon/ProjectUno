@@ -6,8 +6,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import co.edu.unbosque.persistence.Carta;
-import co.edu.unbosque.persistence.Imagen64;
 import co.edu.unbosque.persistence.Jugador;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -24,13 +25,22 @@ public class JuegoBean implements Serializable {
 	private Carta cartaActual;
 	private List<Carta> mazo;
 	private List<Carta> mazoRepartir;
-	private String color;
+	private String color, colorAux;
 	private String numero;
 	private Carta cartaJugada; // Agregamos una nueva propiedad para almacenar la carta jugada
 	private boolean confirmacion;
 
 	public boolean isConfirmacion() {
 		return confirmacion;
+	}
+
+	public String getColorAux() {
+		return colorAux;
+	}
+
+	public void setColorAux(String colorAux) {
+		JOptionPane.showInternalMessageDialog(null, colorAux);
+		this.colorAux = colorAux;
 	}
 
 	public void setConfirmacion(boolean confirmacion) {
@@ -85,7 +95,7 @@ public class JuegoBean implements Serializable {
 					cartaActual = cartaJugada;
 					jugadorActual.getCartas().remove(cartaJugada);
 					seleccionarSiguienteJugador();
-					
+
 					if (cartaJugada.getNumero().equals("+2")) {
 						robarCarta();
 						robarCarta();
@@ -218,30 +228,37 @@ public class JuegoBean implements Serializable {
 	public void cambiarColorAzul() {
 		confirmacion = false;
 		cartaActual.setColor("Azul");
+		JOptionPane.showMessageDialog(null, cartaActual.getColor());
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a azul", null));
-		
+
 	}
+
 	public void cambiarColorRojo() {
 		confirmacion = false;
 		cartaActual.setColor("Rojo");
+		System.err.println(cartaActual.getColor());
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a rojo", null));
-		
+
 	}
+
 	public void cambiarColorAmarillo() {
 		confirmacion = false;
 		cartaActual.setColor("Amarillo");
+		JOptionPane.showMessageDialog(null, cartaActual.getColor());
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a amarillo", null));
-		
+
 	}
+
 	public void cambiarColorVerde() {
 		confirmacion = false;
 		cartaActual.setColor("Verde");
+		JOptionPane.showMessageDialog(null, cartaActual.getColor());
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a verde", null));
-		
+
 	}
 
 	public Carta getCartaJugada() {
