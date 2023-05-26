@@ -19,7 +19,6 @@ public class Carta {
 	}
 
 	public void setColor(String color) {
-		JOptionPane.showMessageDialog(null, color);
 		this.color = color;
 	}
 
