@@ -1,32 +1,34 @@
 package co.edu.unbosque.persistence;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Base64;
+import java.io.InputStream;
+
+import com.google.common.io.BaseEncoding;
 
 public class Imagen64 {
 	
 	public static String cargarImg(String rutaImg) {
 		
-		File entrada = new File(rutaImg);
-		byte[] img = new byte[(int) entrada.length()];
+		InputStream entradaStream = Imagen64.class.getResourceAsStream(rutaImg);
+		byte[] img = null;
 		
-		FileInputStream entradaStream;
 		try {
-			entradaStream = new FileInputStream(entrada);
-			entradaStream.read(img);
-			entradaStream.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			img = entradaStream.readAllBytes();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return Base64.getEncoder().encodeToString(img);
+		int length = img.length;
+		
+		int padding = length % 3 == 0 ? 0 : 3 - length % 3;
+		
+		byte[] paddedBytes = new byte[length + padding];
+		System.arraycopy(img, 0, paddedBytes, 0, length);
+		
+		String base64Encoded = BaseEncoding.base64().encode(paddedBytes);
+		
+		return base64Encoded;
 		
 	}
 	

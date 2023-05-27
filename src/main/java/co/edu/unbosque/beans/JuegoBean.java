@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import co.edu.unbosque.persistence.Carta;
+import co.edu.unbosque.persistence.Imagen64;
 import co.edu.unbosque.persistence.Jugador;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -204,7 +205,7 @@ public class JuegoBean implements Serializable {
 			for (int numero = 0; numero <= 9; numero++) {
 
 				Carta nueva = new Carta(color, String.valueOf(numero));
-//				nueva.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + numero + color + ".png"));
+				nueva.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + numero + color + ".png"));
 				mazo.push(nueva);
 
 				if (numero != 0) {
@@ -212,17 +213,32 @@ public class JuegoBean implements Serializable {
 				}
 			}
 
-			mazo.push(new Carta(color, "Salto"));
-			mazo.push(new Carta(color, "Reversa"));
-			mazo.push(new Carta(color, "+2"));
-			mazo.push(new Carta(color, "Salto"));
-			mazo.push(new Carta(color, "Reversa"));
-			mazo.push(new Carta(color, "+2"));
-
+			Carta nueva = new Carta(color, "+2");
+			nueva.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + "+2" + color + ".png"));
+			mazo.push(nueva);
+			Carta nueva2 = new Carta(color, "Salto");
+			nueva2.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + "Proh" + color + ".png"));
+			mazo.push(nueva2);
+			Carta nueva3 = new Carta(color, "Reversa");
+			nueva3.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + "Rev" + color + ".png"));
+			mazo.push(nueva3);
+			Carta nueva4 = new Carta(color, "+2");
+			nueva4.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + "+2" + color + ".png"));
+			mazo.push(nueva4);
+			Carta nueva5 = new Carta(color, "Salto");
+			nueva5.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + "Proh" + color + ".png"));
+			mazo.push(nueva5);
+			Carta nueva6 = new Carta(color, "Reversa");
+			nueva6.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + "Rev" + color + ".png"));
+			mazo.push(nueva6);
 		}
 		for (int i = 0; i <= 3; i++) {
-			mazo.push(new Carta("Especiales", "Multi"));
-			mazo.push(new Carta("Especiales", "+4"));
+			Carta nuevaE1 = new Carta("Especiales", "+4");
+			nuevaE1.setImagen(Imagen64.cargarImg("../persistence/images/Especiales/+4.png"));
+			mazo.push(nuevaE1);
+			Carta nuevaE2 = new Carta("Especiales", "Multi");
+			nuevaE2.setImagen(Imagen64.cargarImg("../persistence/images/Especiales/Multi.png"));
+			mazo.push(nuevaE2);
 		}
 
 		return mazo;
