@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import javax.swing.JOptionPane;
-
 import co.edu.unbosque.persistence.Carta;
 import co.edu.unbosque.persistence.Jugador;
 import jakarta.annotation.PostConstruct;
@@ -26,15 +24,14 @@ public class JuegoBean implements Serializable {
 	private List<Jugador> jugadores;
 	private Jugador jugadorActual;
 	private Carta cartaActual;
-	private List<Carta> mazo;
-	private List<Carta> mazoRepartir;
-	private String color, colorAux;
+	private Stack<Carta> mazo;
+	private String color;
+	private String colorAux;
 	private String numero;
 	private Carta cartaJugada; // Agregamos una nueva propiedad para almacenar la carta jugada
 	private boolean confirmacion;
 	private boolean sentido;
 	private boolean ganador;
-	private int cont;
 	private Stack<Carta> jugadas;
 
 	public boolean isConfirmacion() {
@@ -62,10 +59,9 @@ public class JuegoBean implements Serializable {
 		jugadores.add(new Jugador("Jugador 3"));
 
 		mazo = generarMazo();
-		mazoRepartir = new ArrayList<>(mazo);
 		jugadas = new Stack<>();
 		rand = new Random();
-		Collections.shuffle(mazoRepartir);
+		Collections.shuffle(mazo);
 		repartirCartas();
 		jugadorActual = jugadores.get(0); // Comienza el juego con el primer jugador
 		boolean especial = true;
@@ -81,18 +77,15 @@ public class JuegoBean implements Serializable {
 			}
 		}
 		
-		
+		color = cartaActual.getColor();
 		ganador = false;
 		confirmacion = false;
 		sentido = true;
-		cont = 1;
-		color = "";
 
 	}
 
 	public Carta obtenerCartaAleatoria() {
-		int indiceAleatorio = (int) (Math.random() * mazoRepartir.size());
-		return mazoRepartir.remove(indiceAleatorio);
+		return mazo.pop();
 	}
 
 	public List<Jugador> getJugadores() {
@@ -116,15 +109,16 @@ public class JuegoBean implements Serializable {
 				if (esCartaValida(cartaJugada)) {
 					cartaActual = cartaJugada;
 					jugadorActual.getCartas().remove(cartaJugada);
+					
+					if(jugadorActual.getCartas().size() == 0) {
+						ganador = true;
+						jugadores.remove(jugadorActual);
+					}
+					
 					jugadas.push(cartaJugada);
 					System.out.println(cartaJugada.getColor() + cartaJugada.getNumero());
 					seleccionarSiguienteJugador();
-
-					if(cartaJugada == null) {
-						cartaJugada = cartaActual;
-						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-								"Carta jugada: " + cartaActual.toString(), ""));
-					}else {
+					
 					if(cartaJugada.getNumero().equals("Reversa")) {
 						sentido = !sentido;
 					}
@@ -145,19 +139,12 @@ public class JuegoBean implements Serializable {
 						}
 					}
 					
-					if((cont % 3) == 1) {
+					color = cartaJugada.getColor();
+					
+					
 						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 								"Carta jugada: " + cartaJugada.toString(), ""));
-						cont++;
-					}
-					
-					}
-					
-					if(jugadorActual.getCartas().size() == 0) {
-						ganador = true;
-						jugadores.remove(jugadorActual);
-					}
-
+						
 					cartaJugada = null;
 					
 				} else {
@@ -172,14 +159,21 @@ public class JuegoBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se ha seleccionado ninguna carta", null));
 		}
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
+		
+		if(!getJugadorActual().getNombre().equals("Jugador 1")) {
+			synchronized(color){
+			while(color.equals("Especiales")) {
+				try {
+					color.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			jugarBot();
+		}
+		}
+		
 	}
 
 	public String getNumero() {
@@ -196,14 +190,14 @@ public class JuegoBean implements Serializable {
 		for (Jugador jugador : jugadores) {
 			jugador.setCartas(new ArrayList<>()); // Limpiar las cartas anteriores del jugador
 			for (int i = 0; i < cartasPorJugador; i++) {
-				Carta carta = mazoRepartir.remove(0); // Tomar la carta del mazo de repartir
+				Carta carta = mazo.pop(); // Tomar la carta del mazo de repartir
 				jugador.getCartas().add(carta);
 			}
 		}
 	}
 
-	public List<Carta> generarMazo() {
-		List<Carta> mazo = new ArrayList<>();
+	public Stack<Carta> generarMazo() {
+		Stack<Carta> mazo = new Stack<>();
 
 		for (String color : Arrays.asList("Rojo", "Verde", "Azul", "Amarillo")) {
 			// Cartas numeradas
@@ -211,24 +205,24 @@ public class JuegoBean implements Serializable {
 
 				Carta nueva = new Carta(color, String.valueOf(numero));
 //				nueva.setImagen(Imagen64.cargarImg("../persistence/images/"+ color + "/" + numero + color + ".png"));
-				mazo.add(nueva);
+				mazo.push(nueva);
 
 				if (numero != 0) {
-					mazo.add(nueva);
+					mazo.push(nueva);
 				}
 			}
 
-			mazo.add(new Carta(color, "Salto"));
-			mazo.add(new Carta(color, "Reversa"));
-			mazo.add(new Carta(color, "+2"));
-			mazo.add(new Carta(color, "Salto"));
-			mazo.add(new Carta(color, "Reversa"));
-			mazo.add(new Carta(color, "+2"));
+			mazo.push(new Carta(color, "Salto"));
+			mazo.push(new Carta(color, "Reversa"));
+			mazo.push(new Carta(color, "+2"));
+			mazo.push(new Carta(color, "Salto"));
+			mazo.push(new Carta(color, "Reversa"));
+			mazo.push(new Carta(color, "+2"));
 
 		}
 		for (int i = 0; i <= 3; i++) {
-			mazo.add(new Carta("Especiales", "Multi"));
-			mazo.add(new Carta("Especiales", "+4"));
+			mazo.push(new Carta("Especiales", "Multi"));
+			mazo.push(new Carta("Especiales", "+4"));
 		}
 
 		return mazo;
@@ -251,10 +245,98 @@ public class JuegoBean implements Serializable {
 		
 		jugadorActual = jugadores.get(siguienteIndex);
 		
-		if(!jugadorActual.getNombre().equals("Jugador 1")) {
+		if (jugadorActual.getIndiceCartaActual() >= jugadorActual.getCartas().size()) {
+			jugadorActual.setIndiceCartaActual(0);
+		}
+	}
+
+	public void robarCarta() {
+		Jugador jugadorActual = getJugadorActual();
+
+		if (!mazo.isEmpty()) {
+			Carta cartaRobada = mazo.pop(); // Tomar la carta del mazo de repartir
+			jugadorActual.getCartas().add(cartaRobada);
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"Carta robada: " + cartaRobada.toString(), "");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} else {
+			if(jugadas.size() > 1){
+				for(Carta aux: jugadas) {
+					mazo.push(aux);
+				}
+				
+				Carta actual = jugadas.pop();
+				jugadas = new Stack<>();
+				jugadas.push(actual);
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN,
+						"!Mazo revuelto!", "");
+				FacesContext.getCurrentInstance().addMessage(null, message);
+				
+			}else {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "No quedan cartas en el mazo", null));
+			}
+		}
+	}
+
+	private boolean esCartaValida(Carta carta) {
+		if (carta.getColor().equals(cartaActual.getColor()) || carta.getNumero().equals(cartaActual.getNumero())) {
+			return true;
+		}
+
+		if (carta.getColor().equals("Especiales")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public void cambiarColorAzul() {
+		synchronized(color) {
+		cartaActual.setColor("Azul");
+		color = "Azul";
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a azul", null));
+		color.notify();
+		}
+
+	}
+
+	public void cambiarColorRojo() {
+		synchronized(color){
+		cartaActual.setColor("Rojo");
+		color = "Rojo";
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a rojo", null));
+		color.notify();
+		}
+	}
+
+	public void cambiarColorAmarillo() {
+		synchronized(color) {
+		cartaActual.setColor("Amarillo");
+		color = "Amarillo";
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a amarillo", null));
+		color.notify();
+		}
+	}
+
+	public void cambiarColorVerde() {
+		synchronized(color) {
+		cartaActual.setColor("Verde");
+		color = "Verde";
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a verde", null));
+		color.notify();
+		}
+	}
+	
+	public void jugarBot() {
 			
 			int r = 0;
 			boolean jugable = false;
+			setConfirmacion(false);
 			
 			while(r < jugadorActual.getCartas().size() && !jugable) {
 				
@@ -328,85 +410,6 @@ public class JuegoBean implements Serializable {
 				}
 				
 			}
-			
-		}
-		
-		if (jugadorActual.getIndiceCartaActual() >= jugadorActual.getCartas().size()) {
-			jugadorActual.setIndiceCartaActual(0);
-		}
-	}
-
-	public void robarCarta() {
-		Jugador jugadorActual = getJugadorActual();
-
-		if (!mazoRepartir.isEmpty()) {
-			Carta cartaRobada = mazoRepartir.remove(0); // Tomar la carta del mazo de repartir
-			jugadorActual.getCartas().add(cartaRobada);
-			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"Carta robada: " + cartaRobada.toString(), "");
-			FacesContext.getCurrentInstance().addMessage(null, message);
-		} else {
-			if(jugadas.size() > 1){
-				for(Carta aux: jugadas) {
-					mazoRepartir.add(aux);
-				}
-				
-				Carta actual = jugadas.pop();
-				jugadas = new Stack<>();
-				jugadas.push(actual);
-				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"!Mazo revuelto!", "");
-				FacesContext.getCurrentInstance().addMessage(null, message);
-				
-			}else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN, "No quedan cartas en el mazo", null));
-			}
-		}
-	}
-
-	private boolean esCartaValida(Carta carta) {
-		if (carta.getColor().equals(cartaActual.getColor()) || carta.getNumero().equals(cartaActual.getNumero())) {
-			return true;
-		}
-
-		if (carta.getColor().equals("Especiales")) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public void cambiarColorAzul() {
-		confirmacion = false;
-		cartaActual.setColor("Azul");
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a azul", null));
-
-	}
-
-	public void cambiarColorRojo() {
-		confirmacion = false;
-		cartaActual.setColor("Rojo");
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a rojo", null));
-
-	}
-
-	public void cambiarColorAmarillo() {
-		confirmacion = false;
-		cartaActual.setColor("Amarillo");
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a amarillo", null));
-
-	}
-
-	public void cambiarColorVerde() {
-		confirmacion = false;
-		cartaActual.setColor("Verde");
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a verde", null));
-
 	}
 
 	public Carta getCartaJugada() {
