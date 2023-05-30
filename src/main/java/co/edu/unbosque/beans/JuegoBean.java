@@ -26,6 +26,7 @@ public class JuegoBean implements Serializable {
 	private Random rand;
 	private List<Jugador> jugadores;
 	private Jugador jugadorActual;
+	private Jugador jugadorAnt;
 	private Carta cartaActual;
 	private Stack<Carta> mazo;
 	private String colorAux;
@@ -105,6 +106,7 @@ public class JuegoBean implements Serializable {
 		rand = new Random();
 		Collections.shuffle(mazo);
 		repartirCartas();
+		jugadorAnt = jugadores.get(jugadores.size() - 1);
 		jugadorActual = jugadores.get(0); // Comienza el juego con el primer jugador
 		boolean especial = true;
 
@@ -120,6 +122,7 @@ public class JuegoBean implements Serializable {
 			}
 		}
 
+		colorAux = "";
 		ganador = false;
 		confirmacion = false;
 		sentido = true;
@@ -150,6 +153,7 @@ public class JuegoBean implements Serializable {
 			if (jugadorActual.getCartas().contains(cartaJugada)) {
 				if (esCartaValida(cartaJugada)) {
 					cartaActual = cartaJugada;
+					
 					jugadorActual.getCartas().remove(cartaJugada);
 
 					if (jugadorActual.getCartas().size() == 0) {
@@ -174,13 +178,14 @@ public class JuegoBean implements Serializable {
 						robarCarta();
 					}
 					if (cartaJugada.getColor().equals("Especiales")) {
-						confirmar();
+						confirmar(jugadorActual);
 						if (cartaJugada.getNumero().equals("+4")) {
 							robarCarta();
 							robarCarta();
 							robarCarta();
 							robarCarta();
 						}
+						
 					}
 
 					if (!cartaJugada.getColor().equals("Especiales")) {
@@ -190,13 +195,19 @@ public class JuegoBean implements Serializable {
 							}
 						}
 					}
+					if(jugadorActual.getNombre().equals("Jugador 2")) {
+						if(cartaJugada.getColor().equals("Especiales")) {
+							cambiarColorBot(rand.nextInt(1, 5));
+							if(getJugadorActual().getNombre().equals("Jugador 3")) {
+							jugarBot();
+							}
+						}
+					}
 
 					if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 								"Carta jugada: " + jugadorActual.getNombre() + " " + cartaJugada.toString(), ""));
 					}
-
-					cartaJugada = null;
 
 				} else {
 					FacesContext.getCurrentInstance().addMessage(null,
@@ -206,7 +217,11 @@ public class JuegoBean implements Serializable {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"La carta seleccionada no pertenece al jugador actual", null));
 			}
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se ha seleccionado ninguna carta", null));
 		}
+
 	}
 
 	public String getNumero() {
@@ -292,7 +307,13 @@ public class JuegoBean implements Serializable {
 			}
 		}
 
+		try {
+		jugadorAnt = jugadores.get(indexActual);
 		jugadorActual = jugadores.get(siguienteIndex);
+		}catch(IndexOutOfBoundsException e) {
+			ganador = true;
+		}
+		
 
 		if (jugadorActual.getIndiceCartaActual() >= jugadorActual.getCartas().size()) {
 			jugadorActual.setIndiceCartaActual(0);
@@ -305,9 +326,11 @@ public class JuegoBean implements Serializable {
 		if (!mazo.isEmpty()) {
 			Carta cartaRobada = mazo.pop(); // Tomar la carta del mazo de repartir
 			jugadorActual.getCartas().add(cartaRobada);
+			if(jugadorActual.getNombre().equals("Jugador 1")) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"Carta robada: " + cartaRobada.toString() + " por " + getJugadorActual().getNombre(), "");
+					"Carta robada: " + cartaRobada.toString(), "");
 			FacesContext.getCurrentInstance().addMessage(null, message);
+			}
 		} else {
 			if (jugadas.size() > 1) {
 				for (Carta aux : jugadas) {
@@ -319,7 +342,8 @@ public class JuegoBean implements Serializable {
 				jugadas.push(actual);
 				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "!Mazo revuelto!", "");
 				FacesContext.getCurrentInstance().addMessage(null, message);
-
+				robarCarta();
+				
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage(FacesMessage.SEVERITY_WARN, "No quedan cartas en el mazo", null));
@@ -344,9 +368,6 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a azul", null));
-		if (cartaActual.getColor().equals("Especiales")) {
-			seleccionarSiguienteJugador();
-		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 			jugarBot();
 		}
@@ -357,9 +378,6 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a rojo", null));
-		if (cartaActual.getColor().equals("Especiales")) {
-			seleccionarSiguienteJugador();
-		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 			jugarBot();
 		}
@@ -370,9 +388,6 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a amarillo", null));
-		if (cartaActual.getColor().equals("Especiales")) {
-			seleccionarSiguienteJugador();
-		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 			jugarBot();
 		}
@@ -383,46 +398,35 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a verde", null));
-		if (cartaActual.getColor().equals("Especiales")) {
-			seleccionarSiguienteJugador();
-		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 			jugarBot();
 		}
 	}
+
 
 	public void jugarBot() {
 
 		int r = 0;
 		boolean jugable = false;
 
-		while (r < jugadorActual.getCartas().size() && !jugable) {
+		while (r < getJugadorActual().getCartas().size() && !jugable) {
 
-			jugable = esCartaValida(jugadorActual.getCartas().get(r));
+			jugable = esCartaValida(getJugadorActual().getCartas().get(r));
 
 			if (jugable) {
-				cartaJugada = jugadorActual.getCartas().get(r);
+				cartaJugada = getJugadorActual().getCartas().get(r);
 				setConfirmacion(false);
-				System.out.println(cartaJugada.getColor() + cartaJugada.getNumero());
+				System.out.println(getJugadorActual().getNombre() + cartaJugada.getColor() + cartaJugada.getNumero());
+				
+				jugarCarta();
+				
 				if (cartaJugada.getColor().equals("Especiales")) {
 
 					int ran = rand.nextInt(1, 5);
-
-					if (ran == 1) {
-						cambiarColorAzul();
-					}
-					if (ran == 2) {
-						cambiarColorRojo();
-					}
-					if (ran == 3) {
-						cambiarColorVerde();
-					}
-					if (ran == 4) {
-						cambiarColorAmarillo();
-					}
-
+					cambiarColorBot(ran);
+					
 				}
-				jugarCarta();
+				
 			}
 
 			r++;
@@ -436,31 +440,23 @@ public class JuegoBean implements Serializable {
 			while (!jugable2) {
 
 				robarCarta();
-				jugable2 = esCartaValida(jugadorActual.getCartas().get(r));
+				jugable2 = esCartaValida(getJugadorActual().getCartas().get(r));
 
 				if (jugable2) {
-					cartaJugada = jugadorActual.getCartas().get(r);
+					cartaJugada = getJugadorActual().getCartas().get(r);
 					setConfirmacion(false);
-					System.out.println(cartaJugada.getColor() + cartaJugada.getNumero());
+					System.out
+							.println(getJugadorActual().getNombre() + cartaJugada.getColor() + cartaJugada.getNumero());
+					
+					jugarCarta();
+					
 					if (cartaJugada.getColor().equals("Especiales")) {
 
 						int ran = rand.nextInt(1, 5);
-
-						if (ran == 1) {
-							cambiarColorAzul();
-						}
-						if (ran == 2) {
-							cambiarColorRojo();
-						}
-						if (ran == 3) {
-							cambiarColorVerde();
-						}
-						if (ran == 4) {
-							cambiarColorAmarillo();
-						}
+						cambiarColorBot(ran);
 
 					}
-					jugarCarta();
+					
 				}
 
 				r++;
@@ -470,12 +466,28 @@ public class JuegoBean implements Serializable {
 		}
 	}
 
-	public void confirmar() {
-		if (!jugadorActual.getNombre().equals("Jugador 1")) {
+	public void confirmar(Jugador jug) {
+		if (jug.getNombre().equals("Jugador 1")) {
 			confirmacion = true;
 		} else {
 			confirmacion = false;
 		}
+	}
+	
+	public void cambiarColorBot(int ran) {
+		// TODO Auto-generated method stub
+		 if(ran == 1) {
+			 cartaJugada.setColor("Azul");
+		 }
+		 if(ran == 2) {
+			 cartaJugada.setColor("Rojo");
+		 }
+		 if(ran == 3) {
+			 cartaJugada.setColor("Amarillo");
+		 }
+		 if(ran == 4) {
+			 cartaJugada.setColor("Verde");
+		 }
 	}
 
 	public Carta getCartaJugada() {
@@ -492,5 +504,9 @@ public class JuegoBean implements Serializable {
 
 	public void setGanador(boolean ganador) {
 		this.ganador = ganador;
+	}
+	
+	public Jugador getJugadorAnt() {
+		return this.jugadorAnt;
 	}
 }
