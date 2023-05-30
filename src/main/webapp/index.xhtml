@@ -8,15 +8,39 @@
 <h:head>
 	<title>UNO</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css"></link>
+
 </h:head>
 
 <h:body>
-	<div class="center-box">
-		<div class="box">
+	<h:form>
+		<div class="menu-container">
+			<p:commandButton id="menuButton" class="button is-danger m-3"
+				value="Ver las cartas del juego" />
+			<p:menu overlay="true" trigger="menuButton" my="left top"
+				at="left bottom">
+				<p:submenu label="Cartas a mostrar:">
+					<p:menuitem value="Mostrar cartas de los jugadores">
+						<p:commandButton type="button" value="Jugadores"
+							class="button is-danger" onclick="PF('dialogJugadores').show()"
+							update="@form" />
+					</p:menuitem>
+					<p:menuitem value="Mostrar cartas del mazo para robar">
+						<p:commandButton type="button" value="Para robar"
+							class="button is-danger" onclick="PF('dialogMazo').show()"
+							update="@form" />
+					</p:menuitem>
+					<p:menuitem value="Mostrar cartas jugadas">
+						<p:commandButton type="button" value="Jugadas"
+							class="button is-danger" onclick="PF('dialogJugadas').show()"
+							update="@form" />
+					</p:menuitem>
+				</p:submenu>
+			</p:menu>
+		</div>
 
-			<div class="container">
-				<h:form>
-
+		<div class="center-box">
+			<div class="box">
+				<div class="container">
 					<section class="hero is-danger">
 						<div class="hero-body">
 							<p class="title">Jugador actual:
@@ -26,40 +50,47 @@
 					</section>
 
 					<div class="scrollable-table">
-						<table class="table is-bordered is-fullwidth">
-							<thead>
-								<tr>
-									<th>Carta</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<ui:repeat value="#{juego.jugadorActual.cartas}" var="carta">
+						<div style="overflow-x: auto;">
+							<table class="table">
+								<thead>
 									<tr>
-										<td>#{carta} <!-- <IMG src="data:image/png;base64,#{carta.imagen}" /> -->
-										</td>
-										<td class="is-narrow"><p:commandButton
-												class="button is-success" value="Jugar"
-												action="#{juego.jugarCarta}" update="@form">
-												<f:setPropertyActionListener target="#{juego.cartaJugada}"
-													value="#{carta}" />
-											</p:commandButton></td>
+										<ui:repeat value="#{juego.jugadorActual.cartas}" var="carta">
+											<th>
+												<!-- #{carta}--> <IMG
+												src="data:image/png;base64,#{carta.imagen}" />
+											</th>
+										</ui:repeat>
 									</tr>
-								</ui:repeat>
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									<tr>
+										<ui:repeat value="#{juego.jugadorActual.cartas}" var="carta">
+											<td>
+												<div class="has-text-centered">
+													<p:commandButton class="button is-success" value="Jugar"
+														action="#{juego.jugarCarta}" update="@form">
+														<f:setPropertyActionListener target="#{juego.cartaJugada}"
+															value="#{carta}" />
+													</p:commandButton>
+												</div>
+											</td>
+										</ui:repeat>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 
 					<div class="has-text-centered">
-						<p:commandButton class="button is-link  mt-3" value="Robar"
+						<p:commandButton class="button is-link mt-3" value="Robar"
 							action="#{juego.robarCarta}" update="@form" />
 						<p:messages />
 						<!-- La parte de las imagenes se van a hacer con tooltip https://www.primefaces.org/showcase/ui/overlay/tooltip/tooltipOptions.xhtml?jfwid=27dc2 -->
 					</div>
+
 					<p:confirmDialog global="true" header="Color" showEffect="fade"
 						hideEffect="fade" message="Elige un color" responsive="true"
-						visible="#{juego.confirmacion}">
-
+						closable="false" visible="#{juego.confirmacion}">
 						<div class="buttons">
 							<p:commandButton value="Rojo" styleClass="button is-danger"
 								action="#{juego.cambiarColorRojo}" update="@form" />
@@ -70,13 +101,79 @@
 							<p:commandButton value="Verde" styleClass="button is-success"
 								action="#{juego.cambiarColorVerde}" update="@form" />
 						</div>
-
 					</p:confirmDialog>
-				</h:form>
+
+					<p:confirmDialog global="true" header="Ganador" showEffect="fade"
+						hideEffect="fade" message="¡Has ganado!" responsive="true"
+						closable="false" visible="#{juego.ganador}">
+						<div class="buttons">
+							<p:commandButton value="Reiniciar el juego"
+								styleClass="button is-danger"
+								actionListener="#{juego.reiniciarJuego}" process="@this" />
+						</div>
+					</p:confirmDialog>
+
+					<p:confirmDialog global="true" header="Cartas de cada jugador"
+						widgetVar="dialogJugadores" modal="true" resizable="false">
+						<div class="modal-content">
+							<div class="table-container has-text-centered">
+								<h:form>
+									<p:dataTable value="#{juego.jugadores}" var="jugador"
+										paginator="true" rows="10"
+										emptyMessage="No hay datos disponibles">
+										<p:column headerText="Jugador">
+											#{jugador.nombre}
+										</p:column>
+										<p:column headerText="Cartas">
+											<ui:repeat value="#{jugador.cartas}" var="carta">
+												#{carta.numero} de #{carta.color}
+												<br />
+											</ui:repeat>
+										</p:column>
+									</p:dataTable>
+								</h:form>
+							
+							</div>
+						</div>
+					</p:confirmDialog>
+
+					<p:confirmDialog global="true" header="Cartas del mazo para robar"
+						widgetVar="dialogMazo" modal="true" resizable="false">
+						<div class="modal-content">
+							<div class="table-container has-text-centered">
+								<h:form>
+									<p:dataTable value="#{juego.mazo}" var="carta" paginator="true"
+										rows="10" emptyMessage="No hay datos disponibles">
+										<p:column headerText="Carta">
+											#{carta.numero} de #{carta.color}
+										</p:column>
+									</p:dataTable>
+								</h:form>
+						
+							</div>
+						</div>
+					</p:confirmDialog>
+
+					<p:confirmDialog global="true" header="Mazo de cartas jugadas"
+						widgetVar="dialogJugadas" modal="true" resizable="false">
+						<div class="modal-content">
+							<div class="table-container has-text-centered">
+								<h:form>
+									<p:dataTable value="#{juego.jugadas}" var="carta"
+										paginator="true" rows="10"
+										emptyMessage="No hay datos disponibles">
+										<p:column headerText="Carta">
+											#{carta.numero} de #{carta.color}
+										</p:column>
+									</p:dataTable>
+								</h:form>
+							
+							</div>
+						</div>
+					</p:confirmDialog>
+				</div>
 			</div>
 		</div>
-	</div>
+	</h:form>
 </h:body>
-
 </html>
-
