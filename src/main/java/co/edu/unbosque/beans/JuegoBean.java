@@ -1,5 +1,6 @@
 package co.edu.unbosque.beans;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import co.edu.unbosque.persistence.Imagen64;
 import co.edu.unbosque.persistence.Jugador;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
@@ -27,12 +29,39 @@ public class JuegoBean implements Serializable {
 	private Carta cartaActual;
 	private Stack<Carta> mazo;
 	private String colorAux;
+
+	public Stack<Carta> getMazo() {
+		return mazo;
+	}
+
+	public void setMazo(Stack<Carta> mazo) {
+		this.mazo = mazo;
+	}
+
+	public Stack<Carta> getJugadas() {
+		return jugadas;
+	}
+
+	public void setJugadas(Stack<Carta> jugadas) {
+		this.jugadas = jugadas;
+	}
+
 	private String numero;
 	private Carta cartaJugada; // Agregamos una nueva propiedad para almacenar la carta jugada
 	private boolean confirmacion;
 	private boolean sentido;
 	private boolean ganador;
 	private Stack<Carta> jugadas;
+	private String nombre;
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		jugadores.get(0).setNombre(nombre);
+		this.nombre = nombre;
+	}
 
 	public boolean isConfirmacion() {
 		return confirmacion;
@@ -48,6 +77,19 @@ public class JuegoBean implements Serializable {
 
 	public void setConfirmacion(boolean confirmacion) {
 		this.confirmacion = confirmacion;
+	}
+
+	public void reiniciarJuego() {
+
+		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+
+		try {
+
+			externalContext.redirect(externalContext.getRequestContextPath() + "/index.xhtml");
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
 	}
 
 	@PostConstruct
@@ -142,14 +184,14 @@ public class JuegoBean implements Serializable {
 					}
 
 					if (!cartaJugada.getColor().equals("Especiales")) {
-						if(!cartaJugada.getNumero().equals("+4")) {
+						if (!cartaJugada.getNumero().equals("+4")) {
 							if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 								jugarBot();
 							}
 						}
 					}
 
-					if(!getJugadorActual().getNombre().equals("Jugador 1")) {
+					if (!getJugadorActual().getNombre().equals("Jugador 1")) {
 						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 								"Carta jugada: " + jugadorActual.getNombre() + " " + cartaJugada.toString(), ""));
 					}
@@ -302,7 +344,7 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a azul", null));
-		if(cartaActual.getColor().equals("Especiales")) {
+		if (cartaActual.getColor().equals("Especiales")) {
 			seleccionarSiguienteJugador();
 		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
@@ -315,7 +357,7 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a rojo", null));
-		if(cartaActual.getColor().equals("Especiales")) {
+		if (cartaActual.getColor().equals("Especiales")) {
 			seleccionarSiguienteJugador();
 		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
@@ -328,7 +370,7 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a amarillo", null));
-		if(cartaActual.getColor().equals("Especiales")) {
+		if (cartaActual.getColor().equals("Especiales")) {
 			seleccionarSiguienteJugador();
 		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
@@ -341,7 +383,7 @@ public class JuegoBean implements Serializable {
 		confirmacion = false;
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_WARN, "Se cambio de color a verde", null));
-		if(cartaActual.getColor().equals("Especiales")) {
+		if (cartaActual.getColor().equals("Especiales")) {
 			seleccionarSiguienteJugador();
 		}
 		if (!getJugadorActual().getNombre().equals("Jugador 1")) {
