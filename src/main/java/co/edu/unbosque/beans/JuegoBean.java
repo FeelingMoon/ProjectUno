@@ -100,7 +100,6 @@ public class JuegoBean implements Serializable {
 		jugadores.add(new Jugador("Jugador 1"));
 		jugadores.add(new Jugador("Jugador 2"));
 		jugadores.add(new Jugador("Jugador 3"));
-
 		mazo = generarMazo();
 		jugadas = new Stack<>();
 		rand = new Random();
@@ -153,12 +152,12 @@ public class JuegoBean implements Serializable {
 			if (jugadorActual.getCartas().contains(cartaJugada)) {
 				if (esCartaValida(cartaJugada)) {
 					cartaActual = cartaJugada;
-					
+
 					jugadorActual.getCartas().remove(cartaJugada);
 
 					if (jugadorActual.getCartas().size() == 0) {
 						ganador = true;
-						jugadores.remove(jugadorActual);
+
 					}
 
 					jugadas.push(cartaJugada);
@@ -185,7 +184,7 @@ public class JuegoBean implements Serializable {
 							robarCarta();
 							robarCarta();
 						}
-						
+
 					}
 
 					if (!cartaJugada.getColor().equals("Especiales")) {
@@ -195,11 +194,11 @@ public class JuegoBean implements Serializable {
 							}
 						}
 					}
-					if(jugadorActual.getNombre().equals("Jugador 2")) {
-						if(cartaJugada.getColor().equals("Especiales")) {
+					if (jugadorActual.getNombre().equals("Jugador 2")) {
+						if (cartaJugada.getColor().equals("Especiales")) {
 							cambiarColorBot(rand.nextInt(1, 5));
-							if(getJugadorActual().getNombre().equals("Jugador 3")) {
-							jugarBot();
+							if (getJugadorActual().getNombre().equals("Jugador 3")) {
+								jugarBot();
 							}
 						}
 					}
@@ -308,12 +307,11 @@ public class JuegoBean implements Serializable {
 		}
 
 		try {
-		jugadorAnt = jugadores.get(indexActual);
-		jugadorActual = jugadores.get(siguienteIndex);
-		}catch(IndexOutOfBoundsException e) {
+			jugadorAnt = jugadores.get(indexActual);
+			jugadorActual = jugadores.get(siguienteIndex);
+		} catch (IndexOutOfBoundsException e) {
 			ganador = true;
 		}
-		
 
 		if (jugadorActual.getIndiceCartaActual() >= jugadorActual.getCartas().size()) {
 			jugadorActual.setIndiceCartaActual(0);
@@ -326,10 +324,10 @@ public class JuegoBean implements Serializable {
 		if (!mazo.isEmpty()) {
 			Carta cartaRobada = mazo.pop(); // Tomar la carta del mazo de repartir
 			jugadorActual.getCartas().add(cartaRobada);
-			if(jugadorActual.getNombre().equals("Jugador 1")) {
-			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"Carta robada: " + cartaRobada.toString(), "");
-			FacesContext.getCurrentInstance().addMessage(null, message);
+			if (jugadorActual.getNombre().equals("Jugador 1")) {
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,
+						"Carta robada: " + cartaRobada.toString(), "");
+				FacesContext.getCurrentInstance().addMessage(null, message);
 			}
 		} else {
 			if (jugadas.size() > 1) {
@@ -343,7 +341,7 @@ public class JuegoBean implements Serializable {
 				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "!Mazo revuelto!", "");
 				FacesContext.getCurrentInstance().addMessage(null, message);
 				robarCarta();
-				
+
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage(FacesMessage.SEVERITY_WARN, "No quedan cartas en el mazo", null));
@@ -403,7 +401,6 @@ public class JuegoBean implements Serializable {
 		}
 	}
 
-
 	public void jugarBot() {
 
 		int r = 0;
@@ -417,16 +414,16 @@ public class JuegoBean implements Serializable {
 				cartaJugada = getJugadorActual().getCartas().get(r);
 				setConfirmacion(false);
 				System.out.println(getJugadorActual().getNombre() + cartaJugada.getColor() + cartaJugada.getNumero());
-				
+
 				jugarCarta();
-				
+
 				if (cartaJugada.getColor().equals("Especiales")) {
 
 					int ran = rand.nextInt(1, 5);
 					cambiarColorBot(ran);
-					
+
 				}
-				
+
 			}
 
 			r++;
@@ -447,16 +444,16 @@ public class JuegoBean implements Serializable {
 					setConfirmacion(false);
 					System.out
 							.println(getJugadorActual().getNombre() + cartaJugada.getColor() + cartaJugada.getNumero());
-					
+
 					jugarCarta();
-					
+
 					if (cartaJugada.getColor().equals("Especiales")) {
 
 						int ran = rand.nextInt(1, 5);
 						cambiarColorBot(ran);
 
 					}
-					
+
 				}
 
 				r++;
@@ -473,21 +470,21 @@ public class JuegoBean implements Serializable {
 			confirmacion = false;
 		}
 	}
-	
+
 	public void cambiarColorBot(int ran) {
 		// TODO Auto-generated method stub
-		 if(ran == 1) {
-			 cartaJugada.setColor("Azul");
-		 }
-		 if(ran == 2) {
-			 cartaJugada.setColor("Rojo");
-		 }
-		 if(ran == 3) {
-			 cartaJugada.setColor("Amarillo");
-		 }
-		 if(ran == 4) {
-			 cartaJugada.setColor("Verde");
-		 }
+		if (ran == 1) {
+			cartaJugada.setColor("Azul");
+		}
+		if (ran == 2) {
+			cartaJugada.setColor("Rojo");
+		}
+		if (ran == 3) {
+			cartaJugada.setColor("Amarillo");
+		}
+		if (ran == 4) {
+			cartaJugada.setColor("Verde");
+		}
 	}
 
 	public Carta getCartaJugada() {
@@ -505,7 +502,7 @@ public class JuegoBean implements Serializable {
 	public void setGanador(boolean ganador) {
 		this.ganador = ganador;
 	}
-	
+
 	public Jugador getJugadorAnt() {
 		return this.jugadorAnt;
 	}
