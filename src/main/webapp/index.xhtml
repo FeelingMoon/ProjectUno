@@ -104,8 +104,14 @@
 					</p:confirmDialog>
 
 					<p:confirmDialog global="true" header="Ganador" showEffect="fade"
-						hideEffect="fade" message="¡Has ganado!" responsive="true"
+						hideEffect="fade" message="Partida finalizada" responsive="true"
 						closable="false" visible="#{juego.ganador}">
+						<div class="hero is-danger">
+							<div class="hero-body">
+								<p class="title">Ha ganado el jugador:
+									#{juego.jugadorActual.nombre}</p>	
+							</div>
+						</div>
 						<div class="buttons">
 							<p:commandButton value="Reiniciar el juego"
 								styleClass="button is-danger"
@@ -132,7 +138,7 @@
 										</p:column>
 									</p:dataTable>
 								</h:form>
-							
+
 							</div>
 						</div>
 					</p:confirmDialog>
@@ -149,7 +155,7 @@
 										</p:column>
 									</p:dataTable>
 								</h:form>
-						
+
 							</div>
 						</div>
 					</p:confirmDialog>
@@ -167,7 +173,7 @@
 										</p:column>
 									</p:dataTable>
 								</h:form>
-							
+
 							</div>
 						</div>
 					</p:confirmDialog>
