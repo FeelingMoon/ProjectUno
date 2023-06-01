@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"co.edu.unbosque.persistence","l":"Carta"},{"p":"co.edu.unbosque.persistence","l":"CartaConverter"},{"p":"co.edu.unbosque.persistence","l":"Imagen64"},{"p":"co.edu.unbosque.beans","l":"JuegoBean"},{"p":"co.edu.unbosque.persistence","l":"Jugador"}];updateSearchResults();
